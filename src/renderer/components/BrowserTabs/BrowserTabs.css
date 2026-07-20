@@ -1,0 +1,153 @@
+.browserTabsBar {
+  display: flex;
+  align-items: center;
+  background-color: var(--side-nav-color);
+  border-block-end: 1px solid var(--primary-shadow-color);
+  inline-size: 100%;
+  min-block-size: 38px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) transparent;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.browserTabsBar::-webkit-scrollbar {
+  block-size: 3px;
+}
+
+.browserTabsBar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.browserTabsBar::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 3px;
+}
+
+.tabsList {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-inline-size: 0;
+  block-size: 38px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-inline: 12px;
+  padding-block: 0;
+  max-inline-size: 200px;
+  min-inline-size: 80px;
+  block-size: 100%;
+  cursor: pointer;
+  color: var(--tertiary-text-color);
+  background-color: transparent;
+  border-inline-end: 1px solid var(--primary-shadow-color);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  position: relative;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.tab:hover {
+  background-color: var(--side-nav-hover-color);
+  color: var(--side-nav-hover-text-color);
+}
+
+.tab.activeTab {
+  background-color: var(--card-bg-color);
+  color: var(--primary-text-color);
+  border-block-start: 2px solid var(--primary-color);
+}
+
+.tabIcon {
+  flex-shrink: 0;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.activeTab .tabIcon {
+  opacity: 1;
+  color: var(--primary-color);
+}
+
+.tabTitle {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.tabCloseBtn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 18px;
+  block-size: 18px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.tab:hover .tabCloseBtn,
+.activeTab .tabCloseBtn {
+  opacity: 0.7;
+}
+
+.tabCloseBtn:hover {
+  background-color: var(--primary-color) !important;
+  color: var(--text-with-main-color) !important;
+  opacity: 1 !important;
+}
+
+.newTabBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 34px;
+  block-size: 34px;
+  margin-inline: 2px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--tertiary-text-color);
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.newTabBtn:hover {
+  background-color: var(--side-nav-hover-color);
+  color: var(--primary-text-color);
+}
+
+@media only screen and (width <= 680px) {
+  .browserTabsBar {
+    overflow-x: auto;
+  }
+
+  .tab {
+    min-inline-size: 60px;
+    padding-inline: 8px;
+  }
+
+  .tabTitle {
+    display: none;
+  }
+}
