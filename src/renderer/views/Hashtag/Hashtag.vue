@@ -49,7 +49,7 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch, onActivated, onDeactivated } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import FtCard from '../../components/ft-card/ft-card.vue'
 import FtElementList from '../../components/FtElementList/FtElementList.vue'
@@ -93,7 +93,13 @@ onMounted(() => {
   getHashtag()
 })
 
-watch(() => route.params.hashtag, () => {
+watch(() => route.params.hashtag, (newHashtag) => {
+  if (!isTabActive.value) {
+    return
+  }
+  if (hashtag.value === decodeURIComponent(newHashtag)) {
+    return
+  }
   resetData()
   getHashtag()
 })

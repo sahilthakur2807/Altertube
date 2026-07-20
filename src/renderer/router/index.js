@@ -193,6 +193,18 @@ export function setSkipTabInterception(value) {
   skipTabInterception = value
 }
 
+const PERSISTENT_PATHS = [
+  '/subscriptions',
+  '/subscribedchannels',
+  '/trending',
+  '/popular',
+  '/userplaylists',
+  '/history',
+  '/settings',
+  '/about',
+  '/'
+]
+
 /**
  * Navigation guard that intercepts "content" navigations and opens them in a
  * new tab instead of replacing the current view.
@@ -207,7 +219,7 @@ export function installTabNavigationGuard(store) {
       return true
     }
 
-    // Only intercept navigations to tab-spawning paths
+    // 1. Only intercept navigations to tab-spawning paths
     if (isTabSpawningPath(to.path)) {
       // Dispatch to Vuex — opens a new tab and calls router.replace internally
       store.dispatch('openInNewTab', {
@@ -215,6 +227,21 @@ export function installTabNavigationGuard(store) {
         query: to.query,
       })
       // Cancel this navigation; the tab action will call router.replace
+      return false
+    }
+
+    // 2. Intercept sidebar/main navigation to open in dedicated tabs
+    const isSidebarPath = PERSISTENT_PATHS.includes(to.path) || to.path.startsWith('/settings/')
+    if (isSidebarPath) {
+      const existingTab = store.getters.getTabs.find(t => t.path === to.path)
+      if (existingTab) {
+        store.dispatch('switchToTab', existingTab.id)
+      } else {
+        store.dispatch('openInNewTab', {
+          path: to.path,
+          query: to.query,
+        })
+      }
       return false
     }
 

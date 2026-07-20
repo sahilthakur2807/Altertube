@@ -170,11 +170,20 @@
     </FtCard>
   </div>
 </template>
-
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch, onActivated, onDeactivated } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { isNavigationFailure, NavigationFailureType, onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+
+const isTabActive = ref(true)
+onActivated(() => {
+  isTabActive.value = true
+})
+onDeactivated(() => {
+  isTabActive.value = false
+})
+
+const loadedPlaylistId = ref('')
 
 import FtLoader from '../../components/FtLoader/FtLoader.vue'
 import FtCard from '../../components/ft-card/ft-card.vue'
@@ -428,6 +437,7 @@ const shownPlaylistItemCount = computed(() => shownPlaylistItems.value)
 const shownVideoCount = computed(() => isUserPlaylistRequested.value ? shownPlaylistItemCount.value.length : videoCount.value)
 
 function getPlaylistInfo() {
+  loadedPlaylistId.value = playlistId.value
   isLoading.value = true
 
   if (isUserPlaylistRequested.value) {
@@ -584,7 +594,15 @@ function parseUserPlaylist(playlist) {
 }
 
 // react to route changes...
-watch(playlistId, getPlaylistInfoDebounce)
+watch(playlistId, (newId) => {
+  if (!isTabActive.value) {
+    return
+  }
+  if (loadedPlaylistId.value === newId) {
+    return
+  }
+  getPlaylistInfoDebounce()
+})
 
 watch(userPlaylistsReady, () => {
   // Fetch from local store when playlist data ready

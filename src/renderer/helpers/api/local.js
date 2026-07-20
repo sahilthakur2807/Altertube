@@ -398,11 +398,41 @@ export async function getLocalVideoInfo(id) {
     withPlayer: true,
     generateSessionLocally: false,
     fetchFunc: async (input, init) => {
-      if (!(input.url?.startsWith('https://www.youtube.com/youtubei/v1/player'))) {
+      const url = typeof input === 'string' ? input : input.url || ''
+      const isPlayer = url.startsWith('https://www.youtube.com/youtubei/v1/player')
+      const isNext = url.includes('/youtubei/v1/next')
+
+      if (!isPlayer && !isNext) {
         return fetch(input, init)
       }
 
       const response = await fetch(input, init)
+
+      if (isNext && response.status === 403) {
+        console.warn('YouTube Next API returned 403 under proxy/Tor. Returning mock data to allow video playback.')
+        const mockData = {
+          contents: {
+            twoColumnWatchNextResults: {
+              results: {
+                results: {
+                  contents: []
+                }
+              }
+            }
+          }
+        }
+        return new Response(JSON.stringify(mockData), {
+          status: 200,
+          statusText: 'OK',
+          headers: {
+            'content-type': 'application/json'
+          }
+        })
+      }
+
+      if (!isPlayer) {
+        return response
+      }
 
       const responseText = await response.text()
 

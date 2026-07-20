@@ -271,7 +271,7 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import autolinker from 'autolinker'
-import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch, onActivated, onDeactivated } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { isNavigationFailure, NavigationFailureType, useRoute, useRouter } from 'vue-router'
 import { YTNodes } from 'youtubei.js'
@@ -298,6 +298,14 @@ import {
   getIconForSortPreference,
   removeFromArrayIfExists
 } from '../../helpers/utils'
+
+const isTabActive = ref(true)
+onActivated(() => {
+  isTabActive.value = true
+})
+onDeactivated(() => {
+  isTabActive.value = false
+})
 import { isNullOrEmpty } from '../../helpers/strings'
 import {
   getInvidiousChannelLive,
@@ -536,6 +544,12 @@ const currentTabViewAllRoute = computed(() => {
 })
 
 watch(route, () => {
+  if (!isTabActive.value) {
+    return
+  }
+  if (id.value === route.params.id && !route.query.url) {
+    return
+  }
   if (skipRouteChangeWatcherOnce) {
     skipRouteChangeWatcherOnce = false
     return

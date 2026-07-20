@@ -575,14 +575,14 @@ const windowTitle = computed(() => {
 const appTitle = computed(() => store.getters.getAppTitle)
 
 watch(appTitle, (value) => {
-  if (value.length > 0) {
+  if (value && value.length > 0) {
     document.title = `${value} - ${packageDetails.productName}`
   } else {
     document.title = packageDetails.productName
   }
 
   // Sync the active tab's title so the tab bar shows meaningful labels
-  if (activeTabId.value && value.length > 0) {
+  if (activeTabId.value && value && value.length > 0) {
     store.commit('updateTabTitle', { id: activeTabId.value, title: value })
   }
 })

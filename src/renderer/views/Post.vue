@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch, onActivated, onDeactivated } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -45,6 +45,14 @@ const { t } = useI18n()
 
 const router = useRouter()
 const route = useRoute()
+
+const isTabActive = ref(true)
+onActivated(() => {
+  isTabActive.value = true
+})
+onDeactivated(() => {
+  isTabActive.value = false
+})
 
 const id = ref('')
 const authorId = ref('')
@@ -130,7 +138,13 @@ async function loadDataInvidiousAsync() {
   }
 }
 
-watch(() => route.params.id, async () => {
+watch(() => route.params.id, async (newId) => {
+  if (!isTabActive.value) {
+    return
+  }
+  if (id.value === newId) {
+    return
+  }
   // react to route changes...
   isLoading.value = true
   id.value = route.params.id

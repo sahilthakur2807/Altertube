@@ -38,7 +38,7 @@
 
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch, onActivated, onDeactivated } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
@@ -64,6 +64,14 @@ import { SEARCH_CHAR_LIMIT } from '../../../constants'
 
 const { t } = useI18n()
 const route = useRoute()
+
+const isTabActive = ref(true)
+onActivated(() => {
+  isTabActive.value = true
+})
+onDeactivated(() => {
+  isTabActive.value = false
+})
 
 const isLoading = ref(false)
 const apiUsed = ref('local')
@@ -92,13 +100,16 @@ const showFamilyFriendlyOnly = computed(() => store.getters.getShowFamilyFriendl
 const rememberSearchHistory = computed(() => store.getters.getRememberSearchHistory)
 
 watch(route, () => {
+  if (!isTabActive.value) {
+    return
+  }
   const query_ = route.params.query.trim()
   let features = route.query.features
   // if page gets refreshed and there's only one feature then it will be a string
   if (typeof features === 'string') {
     features = [features]
   }
-  const searchSettings = {
+  const newSearchSettings = {
     prioritize: route.query.prioritize,
     time: route.query.time,
     type: route.query.type,
@@ -106,10 +117,14 @@ watch(route, () => {
     features: features ?? [],
   }
 
+  if (query.value === query_ && searchFiltersMatch(searchSettings.value, newSearchSettings)) {
+    return
+  }
+
   const payload = {
     query: query_,
     options: {},
-    searchSettings: searchSettings
+    searchSettings: newSearchSettings
   }
 
   query.value = query_
