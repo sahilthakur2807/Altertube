@@ -115,6 +115,14 @@ const router = createRouter({
       component: About
     },
     {
+      path: '/downloads',
+      name: 'downloads',
+      meta: {
+        title: 'Downloads'
+      },
+      component: () => import('../views/Downloads/Downloads.vue')
+    },
+    {
       path: '/settings/profile',
       name: 'profileSettings',
       meta: {
@@ -202,6 +210,7 @@ const PERSISTENT_PATHS = [
   '/history',
   '/settings',
   '/about',
+  '/downloads',
   '/'
 ]
 

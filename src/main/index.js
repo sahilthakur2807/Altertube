@@ -17,7 +17,7 @@ import {
 } from '../constants'
 import * as baseHandlers from '../datastores/handlers/base'
 import { extractExpiryTimestamp, ImageCache } from './ImageCache'
-import { constants as fsConstants, existsSync } from 'fs'
+import { constants as fsConstants, existsSync, watchFile, readFileSync } from 'fs'
 import asyncFs from 'fs/promises'
 import { promisify } from 'util'
 import { brotliDecompress } from 'zlib'
@@ -2080,7 +2080,6 @@ function runApp() {
       else throw err.toString()
     }
   })
-
   // *********** //
 
   function syncOtherWindows(channel, event, payload) {
@@ -2092,6 +2091,65 @@ function runApp() {
       window.webContents.send(channel, payload)
     }
   }
+
+  function setupProxyWatcher() {
+    const proxyFilePath = path.join(app.getPath('userData'), 'working_proxy.json')
+
+    watchFile(proxyFilePath, { interval: 1000 }, async (curr, prev) => {
+      if (curr.mtimeMs === 0 || curr.mtimeMs === prev.mtimeMs) {
+        return
+      }
+
+      try {
+        if (existsSync(proxyFilePath)) {
+          const content = readFileSync(proxyFilePath, 'utf8')
+          if (!content.trim()) return
+          const proxyData = JSON.parse(content)
+
+          // Update NeDB database settings
+          const settingsToUpdate = [
+            { key: 'useProxy', val: proxyData.useProxy },
+            { key: 'proxyProtocol', val: proxyData.proxyProtocol },
+            { key: 'proxyHostname', val: proxyData.proxyHostname },
+            { key: 'proxyPort', val: proxyData.proxyPort },
+            { key: 'proxyUsername', val: proxyData.proxyUsername || '' },
+            { key: 'proxyPassword', val: proxyData.proxyPassword || '' }
+          ]
+
+          for (const s of settingsToUpdate) {
+            await baseHandlers.settings.upsert(s.key, s.val)
+
+            // Broadcast to all open renderer windows
+            const windows = BrowserWindow.getAllWindows()
+            for (const win of windows) {
+              if (isFreeTubeUrl(win.webContents.getURL())) {
+                win.webContents.send(IpcChannels.SYNC_SETTINGS, {
+                  event: SyncEvents.GENERAL.UPSERT,
+                  data: { _id: s.key, value: s.val }
+                })
+              }
+            }
+          }
+
+          // Apply Electron proxy settings dynamically
+          if (proxyData.useProxy) {
+            const proxyRulesUrl = `${proxyData.proxyProtocol}://${proxyData.proxyHostname}:${proxyData.proxyPort}`
+            session.defaultSession.setProxy({ proxyRules: proxyRulesUrl })
+            proxyUrl = proxyRulesUrl
+            session.defaultSession.closeAllConnections()
+          } else {
+            session.defaultSession.setProxy({})
+            proxyUrl = undefined
+            session.defaultSession.closeAllConnections()
+          }
+        }
+      } catch (err) {
+        console.error('Failed to read and apply working_proxy.json:', err)
+      }
+    })
+  }
+
+  setupProxyWatcher()
 
   // ************************************************* //
 

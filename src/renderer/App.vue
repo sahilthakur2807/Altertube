@@ -38,17 +38,17 @@
           v-slot="{ Component }"
           class="routerView"
         >
-          <Transition
-            mode="out-in"
-            name="fade"
-          >
-            <keep-alive>
+          <keep-alive>
+            <Transition
+              mode="out-in"
+              name="fade"
+            >
               <component
                 :is="Component"
                 :key="activeTabId"
               />
-            </keep-alive>
-          </Transition>
+            </Transition>
+          </keep-alive>
         </RouterView>
       </FtFlexBox>
     </div>
@@ -217,7 +217,8 @@ onMounted(async () => {
     }, 500)
   })
 
-  if (route.path === '/') {
+  const hasReloadState = sessionStorage.getItem('ft_reload_state') !== null
+  if (route.path === '/' && !hasReloadState) {
     router.replace({ path: landingPage.value })
   }
 
@@ -226,6 +227,11 @@ onMounted(async () => {
 
   // Install the tab navigation guard now that the store is ready
   installTabNavigationGuard(store)
+
+  // Download progress listener
+  window.ftElectron.onDownloadProgress((update) => {
+    store.commit('updateDownloadProgress', update)
+  })
 
   setWindowTitle()
 

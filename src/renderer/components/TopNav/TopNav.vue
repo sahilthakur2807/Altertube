@@ -64,6 +64,17 @@
           :icon="['fas', 'clone']"
         />
       </button>
+      <button
+        class="navReloadButton navButton"
+        :aria-label="t('Reload App') || 'Reload App'"
+        :title="t('Reload App') || 'Reload App'"
+        @click="reloadApp"
+      >
+        <FontAwesomeIcon
+          class="navIcon"
+          :icon="['fas', 'sync']"
+        />
+      </button>
       <RouterLink
         v-if="!hideHeaderLogo"
         class="logo"
@@ -249,6 +260,38 @@ function createNewWindow() {
   url.hash = landingPage.value
 
   window.open(url.toString(), '_blank', 'noreferrer')
+}
+
+function reloadApp() {
+  const currentTab = store.getters.getActiveTab
+  let resumeVideoId = null
+  let resumeTimestamp = null
+
+  if (currentTab && currentTab.path.startsWith('/watch/')) {
+    resumeVideoId = currentTab.path.replace('/watch/', '')
+    const videoEl = document.querySelector('video')
+    if (videoEl) {
+      resumeTimestamp = videoEl.currentTime
+    }
+  }
+
+  const reloadState = {
+    tabs: store.getters.getTabs.map(t => ({
+      id: t.id,
+      path: t.path,
+      query: t.query,
+      title: t.title,
+      icon: t.icon,
+      closeable: t.closeable,
+      scrollTop: t.scrollTop
+    })),
+    activeTabId: store.getters.getActiveTabId,
+    resumeVideoId,
+    resumeTimestamp
+  }
+
+  sessionStorage.setItem('ft_reload_state', JSON.stringify(reloadState))
+  window.location.reload()
 }
 
 const usingOnlySearchHistoryResults = computed(() => lastSuggestionQuery.value.length === 0)

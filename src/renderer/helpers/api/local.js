@@ -391,6 +391,59 @@ export async function getLocalSearchContinuation(continuationData) {
  * }>}
  */
 export async function getLocalVideoInfo(id) {
+  // Check if downloaded offline copy exists
+  if (window.ftElectron && window.ftElectron.getOfflinePath) {
+    const offlinePaths = await window.ftElectron.getOfflinePath(id)
+    if (offlinePaths) {
+      let dbItem = null
+      try {
+        const dbList = await window.ftElectron.dbDownloads(1) // 1 = DBActions.GENERAL.FIND
+        dbItem = dbList ? dbList.find(item => item._id === id) : null
+      } catch (err) {
+        console.error('Failed to query downloads DB for offline playback:', err)
+      }
+
+      return {
+        info: {
+          playability_status: { status: 'OK' },
+          basic_info: {
+            id,
+            title: dbItem ? dbItem.title : 'Offline Video',
+            author: dbItem ? dbItem.channelName : 'Offline Channel',
+            view_count: 0,
+            is_family_safe: true,
+            short_description: 'Downloaded offline video'
+          },
+          streaming_data: {
+            formats: [
+              {
+                url: offlinePaths.videoUrl,
+                freeTubeUrl: offlinePaths.videoUrl,
+                width: 1280,
+                height: 720,
+                mime_type: 'video/mp4',
+                quality_label: '720p'
+              }
+            ],
+            adaptive_formats: [
+              {
+                url: offlinePaths.videoUrl,
+                freeTubeUrl: offlinePaths.videoUrl,
+                width: 1280,
+                height: 720,
+                mime_type: 'video/mp4',
+                quality_label: '720p'
+              }
+            ]
+          }
+        },
+        poToken: '',
+        clientInfo: {},
+        adEndTimeUnixMs: 0
+      }
+    }
+  }
+
   let responseTime = Date.now()
   let totalAdTimeMilliseconds = 0
 

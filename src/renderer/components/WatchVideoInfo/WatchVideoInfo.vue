@@ -500,6 +500,7 @@ function removeFromQuickBookmarkPlaylist() {
 }
 
 const enableChannelLinks = computed(() => !store.getters.getDisableChannelLinks)
+
 </script>
 
 <style scoped src="./WatchVideoInfo.css" />

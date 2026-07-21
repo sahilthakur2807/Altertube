@@ -309,6 +309,13 @@ export default defineComponent({
         return null
       }
 
+      if (window.ft_reload_resume_video_id === this.videoId && window.ft_reload_resume_time !== null && window.ft_reload_resume_time < this.videoLengthSeconds) {
+        const time = window.ft_reload_resume_time
+        window.ft_reload_resume_time = null
+        window.ft_reload_resume_video_id = null
+        return time
+      }
+
       if (this.oneTimeTimestamp !== null && this.oneTimeTimestamp < this.videoLengthSeconds) {
         return this.oneTimeTimestamp
       } else if (this.timestamp !== null && this.timestamp < this.videoLengthSeconds) {

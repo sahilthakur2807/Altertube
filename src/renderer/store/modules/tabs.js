@@ -163,7 +163,42 @@ const actions = {
    * @param {object} context
    * @param {string} landingPath
    */
-  initTabs({ commit }, landingPath) {
+  initTabs(context, landingPath) {
+    const { commit } = context
+    const savedStateStr = sessionStorage.getItem('ft_reload_state')
+    if (savedStateStr) {
+      try {
+        const savedState = JSON.parse(savedStateStr)
+        sessionStorage.removeItem('ft_reload_state')
+        if (savedState.tabs && savedState.tabs.length > 0) {
+          const tabIds = savedState.tabs.map(t => parseInt(t.id.replace('tab_', '')) || 0)
+          const maxId = Math.max(0, ...tabIds)
+          nextTabId = maxId + 1
+
+          for (const tab of savedState.tabs) {
+            commit('addTab', tab)
+          }
+          commit('setActiveTabId', savedState.activeTabId)
+
+          if (savedState.resumeVideoId && savedState.resumeTimestamp !== null) {
+            window.ft_reload_resume_video_id = savedState.resumeVideoId
+            window.ft_reload_resume_time = savedState.resumeTimestamp
+          }
+
+          const activeTab = savedState.tabs.find(t => t.id === savedState.activeTabId)
+          if (activeTab) {
+            setSkipTabInterception(true)
+            router.replace({ path: activeTab.path, query: activeTab.query }).finally(() => {
+              setSkipTabInterception(false)
+            })
+          }
+          return
+        }
+      } catch (err) {
+        console.error('Failed to restore reload state:', err)
+      }
+    }
+
     const tab = createTab({ path: landingPath, closeable: false })
     commit('addTab', tab)
     commit('setActiveTabId', tab.id)
@@ -174,7 +209,8 @@ const actions = {
    * @param {object} context
    * @param {{ path: string, query?: object, title?: string }} payload
    */
-  openInNewTab({ state, commit }, { path, query = {}, title = '' }) {
+  openInNewTab(context, { path, query = {}, title = '' }) {
+    const { commit } = context
     const tab = createTab({ path, query, title })
     commit('addTab', tab)
     commit('setActiveTabId', tab.id)
@@ -191,7 +227,8 @@ const actions = {
    * @param {object} context
    * @param {string} id
    */
-  switchToTab({ state, commit, getters }, id) {
+  switchToTab(context, id) {
+    const { state, commit } = context
     if (id === state.activeTabId) { return }
 
     const tab = state.tabs.find(t => t.id === id)
@@ -211,7 +248,8 @@ const actions = {
    * @param {object} context
    * @param {string} id
    */
-  closeTab({ state, commit, dispatch }, id) {
+  closeTab(context, id) {
+    const { state, commit, dispatch } = context
     const idx = state.tabs.findIndex(t => t.id === id)
     if (idx === -1) { return }
 
