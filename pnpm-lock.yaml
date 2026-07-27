@@ -51,8 +51,8 @@ importers:
         specifier: ^0.11.10
         version: 0.11.10
       shaka-player:
-        specifier: ^5.1.12
-        version: 5.1.12
+        specifier: ^5.2.3
+        version: 5.2.3
       swiper:
         specifier: ^14.0.5
         version: 14.0.5
@@ -2852,8 +2852,8 @@ packages:
     resolution: {integrity: sha512-eKpRKAovdpZtR1WopLHxlBWvAgPny3c4gX1G5Jhwmmw4XJj0ifSD5qB5TOo8hmA0wlRKDAOAhEE1yVPgs6Fgcg==}
     engines: {node: '>=14.14'}
 
-  fs-extra@11.3.6:
-    resolution: {integrity: sha512-w8ZNZr2mKIc7qeNaQ9AVPT1+iFaI+Avd4xudVOvdDJ8VytREi1Ft5Ih7hd9jjehod8vAM5GMsfQ/TpPf4EyoEA==}
+  fs-extra@11.4.0:
+    resolution: {integrity: sha512-EQsFzMUJkCKGr1ePqlYADkIUmHW1s3ZXr5Yqy6wbGrfUCphpl2maM/kyOIRA2HpP3AaFQTZXD4ldjek+nccddA==}
     engines: {node: '>=14.14'}
 
   fs-extra@7.0.1:
@@ -4498,8 +4498,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shaka-player@5.1.12:
-    resolution: {integrity: sha512-luGIzJ/H201aY0Hobs5853vY1eRJXPHH+u3oSWiTAYoufq5s/yIbRZS1QwCsj3f3Fyxc2C3HfptfI0brjE+RIQ==}
+  shaka-player@5.2.3:
+    resolution: {integrity: sha512-qIstmSOlCqNsRicCOA9FmwIwPxjsZ9qjfqDv2C/N57ECmw5grLoaYP4HU3PMf28t2pgY3pyQDAl64CmoWZIeBg==}
     engines: {node: '>=18'}
 
   shallow-clone@3.0.1:
@@ -5947,7 +5947,7 @@ snapshots:
     dependencies:
       cross-dirname: 0.1.0
       debug: 4.4.3
-      fs-extra: 11.3.6
+      fs-extra: 11.4.0
       minimist: 1.2.8
       postject: 1.0.0-alpha.6
     transitivePeerDependencies:
@@ -8233,7 +8233,7 @@ snapshots:
       jsonfile: 6.2.1
       universalify: 2.0.1
 
-  fs-extra@11.3.6:
+  fs-extra@11.4.0:
     dependencies:
       graceful-fs: 4.2.11
       jsonfile: 6.2.1
@@ -9758,7 +9758,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shaka-player@5.1.12: {}
+  shaka-player@5.2.3: {}
 
   shallow-clone@3.0.1:
     dependencies:
